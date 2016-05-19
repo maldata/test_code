@@ -22,10 +22,10 @@ class ComMonitorThread(threading.Thread):
             is placed into this queue.
         
         port:
-            The COM port to open. Must be recognized by the 
+            The COM port to open. Must be recognized by the
             system.
         
-        port_baud/stopbits/parity: 
+        port_baud/stopbits/parity:
             Serial communication parameters
         
         port_timeout:
@@ -34,8 +34,8 @@ class ComMonitorThread(threading.Thread):
             grained chunks, with more accurate timestamps, but
             it will also consume more CPU.
     """
-    def __init__(   self, 
-                    data_q, error_q, 
+    def __init__(   self,
+                    data_q, error_q,
                     port_num,
                     port_baud,
                     port_stopbits=serial.STOPBITS_ONE,
@@ -58,7 +58,7 @@ class ComMonitorThread(threading.Thread):
         
     def run(self):
         try:
-            if self.serial_port: 
+            if self.serial_port:
                 self.serial_port.close()
             self.serial_port = serial.Serial(**self.serial_arg)
         except serial.SerialException, e:

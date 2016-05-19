@@ -15,7 +15,7 @@ class LiveDataFeed(object):
             
         has_new_data:
             A boolean attribute telling the reader whether the
-            data was updated since the last read.    
+            data was updated since the last read.
     """
     def __init__(self):
         self.cur_data = None
