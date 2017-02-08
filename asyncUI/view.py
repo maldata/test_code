@@ -18,13 +18,13 @@ class BaseView(tkinter.Tk):
         self.after(self.queue_time, self.check_queue)
 
 
-class View:
+class View(BaseView):
     def __init__(self):
-        self.root = BaseView(queue_time=10)
-        self.root.geometry("600x400+200+200")
-        self.root.title("Procedure tester")
+        super().__init__(queue_time=10)
+        self.geometry("600x400+200+200")
+        self.title("Procedure tester")
 
-        frame = tkinter.Frame(self.root, borderwidth=2, relief=tkinter.SUNKEN)
+        frame = tkinter.Frame(self, borderwidth=2, relief=tkinter.SUNKEN)
         frame.pack(fill=tkinter.BOTH, side=tkinter.LEFT, expand=True)
         self.doNowButton = tkinter.Button(frame,
                                           text="Do Something Now",
@@ -39,12 +39,12 @@ class View:
                                                      command=self.doAsyncSlowThing)
         self.doAsyncSlowThingButton.pack(fill=tkinter.X)
 
-        self.p = procedures.DemoProcedure(self.root.result_queue)
+        self.p = procedures.DemoProcedure(self.result_queue)
         self.p.mid_result.handler = self.handle_result
         self.p.end_result.handler = self.handle_result
         
     def runUI(self):
-        self.root.mainloop()
+        self.mainloop()
 
     def doThingNow(self):
         print("Doing a thing RIGHT NOW!")
