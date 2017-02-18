@@ -22,6 +22,8 @@ class Person(Base):
     id = Column(Integer, primary_key=True)
     firstname = Column(String, nullable=False)
     lastname = Column(String, nullable=False)
+    number1 = Column(Integer, nullable=False)
+    number2 = Column(Integer, nullable=False)
 
     @hybrid_property
     def fullname(self):
@@ -29,6 +31,11 @@ class Person(Base):
         # return '{0} {1}'.format(str(self.firstname), str(self.lastname))
         return self.firstname + ' ' + self.lastname
 
+    @hybrid_property
+    def chop(self):
+#        return func.substr(self.lastname, -3)
+        return func.printf('Mod%02dLock%02d', self.number1, self.number2)
+    
 if __name__ == '__main__':
     engine = create_engine('sqlite:///:memory:', echo=True)
 
@@ -37,8 +44,10 @@ if __name__ == '__main__':
     SessionFactory = sessionmaker(bind=engine)
     session = SessionFactory()
 
-    alice = Person(firstname='Alice', lastname='Anderson')
-    bob = Person(firstname='Bob', lastname='Barr')
+    alice = Person(firstname='Alice', lastname='Anderson',
+                   number1=123, number2=456)
+    bob = Person(firstname='Bob', lastname='Barr',
+                 number1=5, number2=12)
 
     session.add_all([alice, bob])
 
@@ -60,3 +69,5 @@ if __name__ == '__main__':
     else:
         print('===========> Not found!')
         
+    me = session.query(Person).filter(Person.chop == 'Mod05Lock12').one_or_none()
+    print('===========> ' + me.lastname)
