@@ -33,8 +33,18 @@ class Person(Base):
 
     @hybrid_property
     def chop(self):
+        """
+        We need to use funcs so this can get compiled to SQL. + becomes
+        SQLite concat, ||.
+        """
 #        return func.substr(self.lastname, -3)
-        return func.printf('Mod%02dLock%02d', self.number1, self.number2)
+#        return func.printf('Mod%02dLock%02d', self.number1, self.number2)
+        modnum = func.printf('%02d', self.number1)
+        modnum = func.substr(modnum, -2)
+        loknum = func.printf('%02d', self.number2)
+        loknum = func.substr(loknum, -2)
+        return 'Mod' + modnum + 'Lock' + loknum
+        
     
 if __name__ == '__main__':
     engine = create_engine('sqlite:///:memory:', echo=True)
@@ -45,7 +55,7 @@ if __name__ == '__main__':
     session = SessionFactory()
 
     alice = Person(firstname='Alice', lastname='Anderson',
-                   number1=123, number2=456)
+                   number1=111123, number2=444456)
     bob = Person(firstname='Bob', lastname='Barr',
                  number1=5, number2=12)
 
@@ -70,4 +80,7 @@ if __name__ == '__main__':
         print('===========> Not found!')
         
     me = session.query(Person).filter(Person.chop == 'Mod05Lock12').one_or_none()
+    print('===========> ' + me.lastname)
+
+    me = session.query(Person).filter(Person.chop == 'Mod23Lock56').one_or_none()
     print('===========> ' + me.lastname)
