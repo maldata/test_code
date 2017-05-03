@@ -8,8 +8,8 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     SampleApp* app = new SampleApp(&a);
 
-    QObject::connect(app, SIGNAL(finished()), &a, SLOT(quit()));
-    QTimer::singleShot(0, app, SLOT(run()));
+    QObject::connect(app, &SampleApp::finished, &a, &QCoreApplication::quit);
+    QTimer::singleShot(0, app, &SampleApp::run);
 
     return a.exec();
 }
