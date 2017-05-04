@@ -15,9 +15,6 @@ int main(int argc, char *argv[])
     std::cout << "Connecting." << std::endl;
 
     QObject::connect(app, &SampleApp::finished, &a, &QCoreApplication::quit);
-
-    std::cout << "Starting up" << std::endl;
-
     QTimer::singleShot(0, app, &SampleApp::startup);
 
     std::cout << "Starting the event loop" << std::endl;

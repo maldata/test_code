@@ -11,7 +11,6 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     sampleapp.cpp \
-    iparent.cpp \
     simchild.cpp \
     realchild.cpp
 
@@ -28,6 +27,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 HEADERS += \
     sampleapp.h \
-    iparent.h \
     simchild.h \
-    realchild.h
+    realchild.h \
+    iframegrabber.h

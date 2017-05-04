@@ -1,12 +1,23 @@
 #ifndef SIMCHILD_H
 #define SIMCHILD_H
 
-#include "iparent.h"
+#include "iframegrabber.h"
 
-class SimChild : public IParent
+class SimChild : public IFrameGrabber
 {
 public:
-    SimChild();
+    explicit SimChild(QObject* parent = nullptr);
+
+protected:
+    void run();
+    void start();
+    void stop();
+
+private:
+
+signals:
+
+public slots:
 };
 
 #endif // SIMCHILD_H

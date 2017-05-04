@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "iparent.h"
+#include "iframegrabber.h"
 
 class SampleApp : public QObject
 {
@@ -13,7 +13,7 @@ public:
     ~SampleApp();
 
 private:
-    IParent* member;
+    IFrameGrabber* member;
 
 signals:
     void finished();

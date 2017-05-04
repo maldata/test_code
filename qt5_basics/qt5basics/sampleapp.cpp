@@ -18,6 +18,7 @@ SampleApp::~SampleApp()
 void SampleApp::startup()
 {
     std::cout << "Starting up" << std::endl;
+    this->member->start();
 
     emit finished();
 }
