@@ -4,3 +4,8 @@ IParent::IParent(QObject *parent) : QObject(parent)
 {
 
 }
+
+IParent::~IParent()
+{
+
+}

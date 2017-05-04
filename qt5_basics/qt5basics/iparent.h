@@ -8,6 +8,7 @@ class IParent : public QObject
     Q_OBJECT
 public:
     explicit IParent(QObject *parent = nullptr);
+    virtual ~IParent();
 
 signals:
 
