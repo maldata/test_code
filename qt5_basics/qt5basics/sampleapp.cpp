@@ -5,25 +5,26 @@
 
 SampleApp::SampleApp(QObject *parent) : QObject(parent)
 {
-    std::cout << "Constructor" << std::endl;
+    std::cout << "Application object constructor" << std::endl;
     this->member = new SimChild();
 }
 
 SampleApp::~SampleApp()
 {
-    std::cout << "Destructor" << std::endl;
+    std::cout << "Application object destructor" << std::endl;
     delete this->member;
 }
 
 void SampleApp::startup()
 {
-    std::cout << "Starting up" << std::endl;
+    std::cout << "Starting up the application object" << std::endl;
     this->member->start();
-
-    emit finished();
 }
 
 void SampleApp::shutdown()
 {
-    std::cout << "Shutting down" << std::endl;
+    std::cout << "Shutting down the application object" << std::endl;
+    this->member->stop();
+    this->member->wait();
+    emit finished();
 }
