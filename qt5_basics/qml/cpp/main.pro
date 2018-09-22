@@ -3,5 +3,6 @@ QT += qml quick
 TARGET = MyExecutable
 TEMPLATE = app
 
-SOURCES += main.cpp
+HEADERS += controller.h
+SOURCES += main.cpp controller.cpp
 
