@@ -1,5 +1,4 @@
 import sys
-import threading
 
 from platform import python_version
 
@@ -166,8 +165,6 @@ class MainController(QObject):
         message_bytes = message.encode('ascii')
 
     def message_handler(self, sender, message):
-        #sender_str = sender.decode('ascii')
-        #message_str = message.decode('ascii')
         self.log_text = '\t==> Message from {0}'.format(sender)
         self.log_text = '\t==> "{0}"'.format(message)
 
