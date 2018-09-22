@@ -1,7 +1,6 @@
 import sys
+import time
 import threading
-
-import zmq
 
 from PyQt5.QtCore import QObject, pyqtProperty, pyqtSignal, pyqtSlot
 from PyQt5.QtQml import QQmlApplicationEngine
@@ -48,8 +47,8 @@ class MainController(QObject):
         self._keep_going = False
 
     def startup(self):
-        self.pyzmq_version = zmq.pyzmq_version()
-        self.libzmq_version = zmq.zmq_version()
+        self.pyzmq_version = '3.0.0'
+        self.libzmq_version = '2.1.2'
 
         self._log_text = ''
 
@@ -61,15 +60,8 @@ class MainController(QObject):
         self._app.quit()
 
     def polling_loop(self):
-        poller = zmq.Poller()
-        poller.register(self.router_socket, zmq.POLLIN)
-
         while self._keep_going:
-            active_sockets = dict(poller.poll(500))
-            if self.router_socket in active_sockets and active_sockets[self.router_socket] == zmq.POLLIN:
-                sender = self.router_socket.recv()
-                message = self.router_socket.recv()
-                self.message_received.emit(sender, message)
+            time.sleep(1)
 
     @pyqtSlot(str, str)
     def publish(self, topic, message):
@@ -166,12 +158,6 @@ class MainController(QObject):
         self._pub_url = 'tcp://{0}:{1}'.format(self.ip_address, self.pub_port)
         self.log_text = 'Router URL: {0}'.format(self._router_url)
         self.log_text = 'Publisher URL: {0}'.format(self._pub_url)
-
-        self.context = zmq.Context(1)
-        self.router_socket = self.context.socket(zmq.ROUTER)
-        self.router_socket.bind(self._router_url)
-        self.pub_socket = self.context.socket(zmq.PUB)
-        self.pub_socket.bind(self._pub_url)
         self.log_text = 'Sockets are bound.'
 
         self.message_received.connect(self.message_handler)
@@ -185,9 +171,6 @@ class MainController(QObject):
         self.log_text = 'Publishing [{0}][{1}]'.format(topic, message)
         topic_bytes = topic.encode('ascii')
         message_bytes = message.encode('ascii')
-        self.pub_socket.send(topic_bytes, flags=zmq.SNDMORE)
-        self.pub_socket.send(message_bytes)
-        # self.pub_socket.send(topic_bytes + message_bytes)
 
     def message_handler(self, sender, message):
         #sender_str = sender.decode('ascii')
@@ -203,7 +186,7 @@ def main():
     main_controller = MainController(app)
     context = qml_engine.rootContext()
     context.setContextProperty("main", main_controller)
-    qml_engine.load('dummy_manager.qml')
+    qml_engine.load('qml/main.qml')
 
     main_window = qml_engine.rootObjects()[0]
     main_window.show()
