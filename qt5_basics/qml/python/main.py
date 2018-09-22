@@ -1,260 +1,216 @@
-import QtQuick 2.5
-import QtQuick.Controls 1.4
-import QtQuick.Layouts 1.2
+import sys
+import threading
 
-ApplicationWindow
-{
-    //title of the application
-    title: qsTr("Dummy Cube Manager")
-    width: 640
-    height: 480
-    color: "whitesmoke"
+import zmq
 
-    onClosing: main.shutdown()
-
-    ColumnLayout
-    {
-        id: mainLayout
-        anchors.fill: parent
-        spacing: 16
-
-        GroupBox
-        {
-            id: infoGroup
-            Layout.fillWidth: true
-
-            ColumnLayout
-            {
-                id: infoLayout
-                anchors.fill: parent
-
-                Label
-                {
-                    id: pyzmqVersion
-                    text: "pyzmq version: " + main.pyzmq_version
-                }
-
-                Label
-                {
-                    id: libzmqVersion
-                    text: "libzmq version: " + main.libzmq_version
-                }
-            }
-        }
-
-        GroupBox
-        {
-            id: connectGroup
-            Layout.fillWidth: true
-
-            GridLayout
-            {
-                id: connectLayout
-                rows: 3
-                columns: 3
-                anchors.fill: parent
-                flow: GridLayout.TopToBottom
-
-                Label { text: "IP Address" }
-                Label { text: "Publisher Port" }
-                Label { text: "Router Port" }
-
-                TextField
-                {
-                    id: connectIP
-                    text: main.ip_address
-                    Layout.fillWidth: true
-
-                    Binding
-                    {
-                        target: main
-                        property: "ip_address"
-                        value: connectIP.text
-                    }
-                }
-                TextField
-                {
-                    id: connectPubPort
-                    text: main.pub_port
-                    Layout.fillWidth: true
-
-                    Binding
-                    {
-                        target: main
-                        property: "pub_port"
-                        value: connectPubPort.text
-                    }
-                }
-                TextField
-                {
-                    id: connectRouterPort
-                    text: main.router_port
-                    Layout.fillWidth: true
-
-                    Binding
-                    {
-                        target: main
-                        property: "router_port"
-                        value: connectRouterPort.text
-                    }
-                }
-
-                Button
-                {
-                    id: connectButton
-                    text: "Connect"
-
-                    Layout.column: 3
-                    Layout.rowSpan: 3
-                    Layout.fillHeight: true
-
-                    onClicked: main.connect()
-                }
-
-            }  // GridLayout
-        }  // publishGroup
-
-        GroupBox
-        {
-            id: publishGroup
-            Layout.fillWidth: true
-
-            GridLayout
-            {
-                id: publishLayout
-                rows: 2
-                columns: 3
-                anchors.fill: parent
-                flow: GridLayout.TopToBottom
-
-                Label { text: "Topic" }
-                Label { text: "Message" }
-
-                TextField
-                {
-                    id: publishTopic
-                    Layout.fillWidth: true
-
-                    enabled: main.connected
-                }
-                TextField
-                {
-                    id: publishMessage
-                    Layout.fillWidth: true
-
-                    enabled: main.connected
-
-                    MouseArea
-                    {
-                        id: messageMouseArea
-
-                        anchors.fill: parent
-                        acceptedButtons: Qt.RightButton
-                        onClicked:
-                        {
-                            if (mouse.button === Qt.RightButton)
-                            {
-                                messageMenu.popup()
-                            }
-                        }  // onClicked
-
-                        onPressAndHold:
-                        {
-                            if (mouse.source === Qt.MouseEventNotSynthesized)
-                            {
-                                messageMenu.popup()
-                            }
-                        }  // onPressAndHold
-
-                        Menu
-                        {
-                            id: messageMenu
-                            MenuItem
-                            {
-                                text: "Exit"
-                                onTriggered: publishMessage.text = "{\"message\": \"EXIT\"}"
-                            }
-                            MenuItem
-                            {
-                                text: "Configure Acquisition"
-                                onTriggered: publishMessage.text = "{\"message\": \"ACQ_CONFIG\", \"data\": {\"TestName\": \"Sample Test\", \"TopicUUID\": \"14bb1a5afd7a4a3490c48cff8a5d2230\", \"CubeConfigs\": [ { \"SerialNumber\": \"cube1sn\", \"CardConfigs\": [ { \"Slot\": 1, \"Channels\": [3, 4, 10, 13] }, { \"Slot\": 3, \"Channels\": [0, 1] }, { \"Slot\": 4, \"Channels\": [4, 5, 18] } ] } ], \"SamplingRate\": 500, \"AcqRate\": 10, \"MaxDuration\": 90 } }"
-                            }
-                            MenuItem
-                            {
-                                text: "Cancel Acquisition"
-                                onTriggered: publishMessage.text = "{\"message\": \"CANCEL\"}"
-                            }
-                            MenuItem
-                            {
-                                text: "Start Acquisition"
-                                onTriggered: publishMessage.text = "{\"message\": \"ACQ_START\"}"
-                            }
-                            MenuItem
-                            {
-                                text: "Start Logging"
-                                onTriggered: publishMessage.text = "{\"message\": \"LOG_START\"}"
-                            }
-                            MenuItem
-                            {
-                                text: "Stop Logging"
-                                onTriggered: publishMessage.text = "{\"message\": \"LOG_STOP\"}"
-                            }
-                            MenuItem
-                            {
-                                text: "Stop Acquisition"
-                                onTriggered: publishMessage.text = "{\"message\": \"ACQ_STOP\"}"
-                            }
-                            MenuItem
-                            {
-                                text: "Recover Data"
-                                onTriggered: publishMessage.text = "{\"message\": \"DATA_RECOVERY\"}"
-                            }
-                            MenuItem
-                            {
-                                text: "Test Complete"
-                                onTriggered: publishMessage.text = "{\"message\": \"TEST_COMPLETE\"}"
-                            }
-                            MenuItem
-                            {
-                                text: "Send Status"
-                                onTriggered: publishMessage.text = "{\"message\": \"SEND_STATUS\"}"
-                            }
-
-                        }  // messageMenu
-
-                    }  // messageMouseArea
-                }
-
-                Button
-                {
-                    id: publishButton
-                    text: "Publish"
-
-                    enabled: main.connected
-
-                    Layout.column: 3
-                    Layout.rowSpan: 2
-                    Layout.fillHeight: true
-
-                    onClicked: main.publish(publishTopic.text, publishMessage.text)
-                }
-
-            }  // GridLayout
-        }  // publishGroup
-
-        Text
-        {
-            id: logBox
-            Layout.fillHeight: true
-
-            font.family: "Monospace"
-            font.pointSize: 12
-
-            text: main.log_text
-        }  // logBox
-
-    }  // ColumnLayout
-}  // ApplicationWindow
+from PyQt5.QtCore import QObject, pyqtProperty, pyqtSignal, pyqtSlot
+from PyQt5.QtQml import QQmlApplicationEngine
+from PyQt5.QtGui import QGuiApplication
 
 
+class MainController(QObject):
+    pyzmq_version_changed = pyqtSignal()
+    libzmq_version_changed = pyqtSignal()
+    log_text_changed = pyqtSignal()
+    connect_status_changed = pyqtSignal()
+    ip_address_changed = pyqtSignal()
+    pub_port_changed = pyqtSignal()
+    router_port_changed = pyqtSignal()
+    topic_changed = pyqtSignal()
+    message_changed = pyqtSignal()
+    message_received = pyqtSignal(bytes, bytes)
 
+    def __init__(self, app):
+        super(MainController, self).__init__()
+        self._app = app
+
+        self._pyzmq_version = ''
+        self._libzmq_version = ''
+
+        self._log_text = ''
+        self._connected = False
+
+        self._ip_address = '127.0.0.1'
+        self._pub_port = 57879
+        self._router_port = 57880
+
+        self._router_url = ''
+        self._pub_url = ''
+
+        self.context = None
+        self.router_socket = None
+        self.pub_socket = None
+
+        self._topic = b''
+        self._message = b''
+
+        self._polling_thread = None
+        self._keep_going = False
+
+    def startup(self):
+        self.pyzmq_version = zmq.pyzmq_version()
+        self.libzmq_version = zmq.zmq_version()
+
+        self._log_text = ''
+
+    @pyqtSlot()
+    def shutdown(self):
+        print("Shutting down.")
+        self._keep_going = False
+        self._polling_thread.join()
+        self._app.quit()
+
+    def polling_loop(self):
+        poller = zmq.Poller()
+        poller.register(self.router_socket, zmq.POLLIN)
+
+        while self._keep_going:
+            active_sockets = dict(poller.poll(500))
+            if self.router_socket in active_sockets and active_sockets[self.router_socket] == zmq.POLLIN:
+                sender = self.router_socket.recv()
+                message = self.router_socket.recv()
+                self.message_received.emit(sender, message)
+
+    @pyqtSlot(str, str)
+    def publish(self, topic, message):
+        self.log_text = 'Publishing {0}{1}'.format(topic, message)
+
+    @pyqtProperty(str, notify=pyzmq_version_changed)
+    def pyzmq_version(self):
+        return self._pyzmq_version
+
+    @pyzmq_version.setter
+    def pyzmq_version(self, value):
+        self._pyzmq_version = value
+        self.pyzmq_version_changed.emit()
+
+    @pyqtProperty(str, notify=libzmq_version_changed)
+    def libzmq_version(self):
+        return self._libzmq_version
+
+    @libzmq_version.setter
+    def libzmq_version(self, value):
+        self._libzmq_version = value
+        self.libzmq_version_changed.emit()
+
+    @pyqtProperty(str, notify=log_text_changed)
+    def log_text(self):
+        return self._log_text
+
+    @log_text.setter
+    def log_text(self, value):
+        self._log_text = value[:60] + '\n' + self._log_text  # Limit the line size to 60 characters 
+        self._log_text = self._log_text[-2000:]  # Limit the total size to 2000 characters
+        self.log_text_changed.emit()
+
+    @pyqtProperty(bool, notify=connect_status_changed)
+    def connected(self):
+        return self._connected
+
+    @connected.setter
+    def connected(self, value):
+        self._connected = value
+        self.connect_status_changed.emit()
+
+    @pyqtProperty(str, notify=ip_address_changed)
+    def ip_address(self):
+        return self._ip_address
+
+    @ip_address.setter
+    def ip_address(self, value):
+        self._ip_address = value
+        self.ip_address_changed.emit()
+
+    @pyqtProperty(int, notify=pub_port_changed)
+    def pub_port(self):
+        return self._pub_port
+
+    @pub_port.setter
+    def pub_port(self, value):
+        self._pub_port = value
+        self.pub_port_changed.emit()
+
+    @pyqtProperty(int, notify=router_port_changed)
+    def router_port(self):
+        return self._router_port
+
+    @router_port.setter
+    def router_port(self, value):
+        self._router_port = value
+        self.router_port_changed.emit()
+
+    @pyqtProperty(str, notify=topic_changed)
+    def topic(self):
+        return self._topic.decode('ascii')
+
+    @topic.setter
+    def topic(self, value):
+        self._topic = value.encode('ascii')
+        self.topic_changed.emit()
+
+    @pyqtProperty(str, notify=message_changed)
+    def message(self):
+        return self._message.decode('ascii')
+
+    @message.setter
+    def message(self, value):
+        self._message = value.encode('ascii')
+        self.message_changed.emit()
+
+    @pyqtSlot()
+    def connect(self):
+        self.log_text = 'Binding to {0}:{1} and {0}:{2}'.format(self.ip_address,
+                                                                self.pub_port,
+                                                                self.router_port)
+        self._router_url = 'tcp://{0}:{1}'.format(self.ip_address, self.router_port)
+        self._pub_url = 'tcp://{0}:{1}'.format(self.ip_address, self.pub_port)
+        self.log_text = 'Router URL: {0}'.format(self._router_url)
+        self.log_text = 'Publisher URL: {0}'.format(self._pub_url)
+
+        self.context = zmq.Context(1)
+        self.router_socket = self.context.socket(zmq.ROUTER)
+        self.router_socket.bind(self._router_url)
+        self.pub_socket = self.context.socket(zmq.PUB)
+        self.pub_socket.bind(self._pub_url)
+        self.log_text = 'Sockets are bound.'
+
+        self.message_received.connect(self.message_handler)
+        self._keep_going = True
+        self._polling_thread = threading.Thread(target=self.polling_loop)
+        self._polling_thread.start()
+        self.connected = True
+
+    @pyqtSlot(str, str)
+    def publish(self, topic, message):
+        self.log_text = 'Publishing [{0}][{1}]'.format(topic, message)
+        topic_bytes = topic.encode('ascii')
+        message_bytes = message.encode('ascii')
+        self.pub_socket.send(topic_bytes, flags=zmq.SNDMORE)
+        self.pub_socket.send(message_bytes)
+        # self.pub_socket.send(topic_bytes + message_bytes)
+
+    def message_handler(self, sender, message):
+        #sender_str = sender.decode('ascii')
+        #message_str = message.decode('ascii')
+        self.log_text = '\t==> Message from {0}'.format(sender)
+        self.log_text = '\t==> "{0}"'.format(message)
+
+        
+def main():
+    app = QGuiApplication(sys.argv)
+    qml_engine = QQmlApplicationEngine()
+
+    main_controller = MainController(app)
+    context = qml_engine.rootContext()
+    context.setContextProperty("main", main_controller)
+    qml_engine.load('dummy_manager.qml')
+
+    main_window = qml_engine.rootObjects()[0]
+    main_window.show()
+
+    main_controller.startup()
+    sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    main()
