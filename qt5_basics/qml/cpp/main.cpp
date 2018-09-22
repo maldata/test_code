@@ -1,16 +1,17 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
-
-#include "backend.h"
+#include <QQuickWindow>
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    qmlRegisterType<BackEnd>("io.qt.examples.backend", 1, 0, "BackEnd");
-
     QQmlApplicationEngine engine;
-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+    engine.load(QUrl("../qml/main.qml"));
 
+    QObject* topLevel = engine.rootObjects().value(0);
+    QQuickWindow* window = qobject_cast<QQuickWindow*>(topLevel);
+    window->show();
+    
     return app.exec();
 }
