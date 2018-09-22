@@ -4,8 +4,7 @@ import QtQuick.Layouts 1.2
 
 ApplicationWindow
 {
-    //title of the application
-    title: qsTr("Dummy Cube Manager")
+    title: qsTr("Qt5 QtQuick Demo")
     width: 640
     height: 480
     color: "whitesmoke"
@@ -30,14 +29,14 @@ ApplicationWindow
 
                 Label
                 {
-                    id: pyzmqVersion
-                    text: "pyzmq version: " + main.pyzmq_version
+                    id: pythonVersion
+                    text: "Python version: " + main.python_version
                 }
 
                 Label
                 {
-                    id: libzmqVersion
-                    text: "libzmq version: " + main.libzmq_version
+                    id: qtVersion
+                    text: "Qt version: " + main.qt_version
                 }
             }
         }

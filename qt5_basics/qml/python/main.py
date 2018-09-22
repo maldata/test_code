@@ -1,15 +1,16 @@
 import sys
-import time
 import threading
 
-from PyQt5.QtCore import QObject, pyqtProperty, pyqtSignal, pyqtSlot
+from platform import python_version
+
+from PyQt5.QtCore import QObject, pyqtProperty, pyqtSignal, pyqtSlot, qVersion
 from PyQt5.QtQml import QQmlApplicationEngine
 from PyQt5.QtGui import QGuiApplication
 
 
 class MainController(QObject):
-    pyzmq_version_changed = pyqtSignal()
-    libzmq_version_changed = pyqtSignal()
+    python_version_changed = pyqtSignal()
+    qt_version_changed = pyqtSignal()
     log_text_changed = pyqtSignal()
     connect_status_changed = pyqtSignal()
     ip_address_changed = pyqtSignal()
@@ -23,8 +24,8 @@ class MainController(QObject):
         super(MainController, self).__init__()
         self._app = app
 
-        self._pyzmq_version = ''
-        self._libzmq_version = ''
+        self._python_version = ''
+        self._qt_version = ''
 
         self._log_text = ''
         self._connected = False
@@ -43,12 +44,11 @@ class MainController(QObject):
         self._topic = b''
         self._message = b''
 
-        self._polling_thread = None
         self._keep_going = False
 
     def startup(self):
-        self.pyzmq_version = '3.0.0'
-        self.libzmq_version = '2.1.2'
+        self.python_version = python_version()
+        self.qt_version = qVersion()
 
         self._log_text = ''
 
@@ -56,34 +56,29 @@ class MainController(QObject):
     def shutdown(self):
         print("Shutting down.")
         self._keep_going = False
-        self._polling_thread.join()
         self._app.quit()
-
-    def polling_loop(self):
-        while self._keep_going:
-            time.sleep(1)
 
     @pyqtSlot(str, str)
     def publish(self, topic, message):
         self.log_text = 'Publishing {0}{1}'.format(topic, message)
 
-    @pyqtProperty(str, notify=pyzmq_version_changed)
-    def pyzmq_version(self):
-        return self._pyzmq_version
+    @pyqtProperty(str, notify=python_version_changed)
+    def python_version(self):
+        return self._python_version
 
-    @pyzmq_version.setter
-    def pyzmq_version(self, value):
-        self._pyzmq_version = value
-        self.pyzmq_version_changed.emit()
+    @python_version.setter
+    def python_version(self, value):
+        self._python_version = value
+        self.python_version_changed.emit()
 
-    @pyqtProperty(str, notify=libzmq_version_changed)
-    def libzmq_version(self):
-        return self._libzmq_version
+    @pyqtProperty(str, notify=qt_version_changed)
+    def qt_version(self):
+        return self._qt_version
 
-    @libzmq_version.setter
-    def libzmq_version(self, value):
-        self._libzmq_version = value
-        self.libzmq_version_changed.emit()
+    @qt_version.setter
+    def qt_version(self, value):
+        self._qt_version = value
+        self.qt_version_changed.emit()
 
     @pyqtProperty(str, notify=log_text_changed)
     def log_text(self):
@@ -162,8 +157,6 @@ class MainController(QObject):
 
         self.message_received.connect(self.message_handler)
         self._keep_going = True
-        self._polling_thread = threading.Thread(target=self.polling_loop)
-        self._polling_thread.start()
         self.connected = True
 
     @pyqtSlot(str, str)
