@@ -17,7 +17,6 @@ class MainController(QObject):
     router_port_changed = pyqtSignal()
     topic_changed = pyqtSignal()
     message_changed = pyqtSignal()
-    message_received = pyqtSignal(bytes, bytes)
 
     def __init__(self, app):
         super(MainController, self).__init__()
@@ -154,7 +153,6 @@ class MainController(QObject):
         self.log_text = 'Publisher URL: {0}'.format(self._pub_url)
         self.log_text = 'Sockets are bound.'
 
-        self.message_received.connect(self.message_handler)
         self._keep_going = True
         self.connected = True
 

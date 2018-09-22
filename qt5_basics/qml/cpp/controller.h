@@ -7,20 +7,34 @@
 class Controller : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString userName READ userName WRITE setUserName NOTIFY userNameChanged)
+
+    // Here I create a property and explicitly specify the accessor functions to use
+    Q_PROPERTY(QString python_version READ getPythonVersion WRITE setPythonVersion NOTIFY python_version_changed)
+
+    // Here I just create a property linked to a member variable and let Qt generate accessors behind the scenes
+    Q_PROPERTY(bool connected MEMBER _connected NOTIFY connect_status_changed)
 
 public:
   explicit Controller(QObject* parent = nullptr);
   virtual ~Controller();
   
-  QString userName();
-  void setUserName(const QString &userName);
+  QString getPythonVersion();
+  void setPythonVersion(const QString& python_version);
   
 signals:
-  void userNameChanged();
+  void python_version_changed();
+  void qt_version_changed();
+  void log_text_changed();
+  void connect_status_changed();
+  void ip_address_changed();
+  void pub_port_changed();
+  void router_port_changed();
+  void topic_changed();
+  void message_changed();
   
 private:
-  QString m_userName;
+  QString _python_version;
+  bool _connected;
 };
 
 #endif

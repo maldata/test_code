@@ -9,16 +9,16 @@ Controller::~Controller()
 {
 }
 
-QString Controller::userName()
+QString Controller::getPythonVersion()
 {
-    return m_userName;
+    return _python_version;
 }
 
-void Controller::setUserName(const QString &userName)
+void Controller::setPythonVersion(const QString& python_version)
 {
-    if (userName == m_userName)
+    if (python_version == _python_version)
         return;
 
-    m_userName = userName;
-    emit userNameChanged();
+    _python_version = python_version;
+    emit python_version_changed();
 }
