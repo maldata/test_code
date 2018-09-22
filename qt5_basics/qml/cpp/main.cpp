@@ -8,7 +8,6 @@
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
-
     QQmlApplicationEngine engine;
 
     Controller main_controller(&app);
@@ -20,5 +19,6 @@ int main(int argc, char *argv[])
     QQuickWindow* window = qobject_cast<QQuickWindow*>(topLevel);
     window->show();
     
+    main_controller.startup();
     return app.exec();
 }
