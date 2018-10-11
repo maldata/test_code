@@ -24,9 +24,8 @@ class ComplexFixture : public CppUnit::TestFixture
   
   void setUp();
   void tearDown();
+  
   void testEquality();
   void testAddition();
   void testDivideByZeroThrows();
-
-
 };

@@ -13,7 +13,7 @@ void ComplexFixture::setUp()
 {
   m_10_1 = new Complex( 10, 1 );
   m_1_1 = new Complex( 1, 1 );
-  m_11_2 = new Complex( 11, 2 );  
+  m_11_2 = new Complex( 11, 2 );
 }
 
 void ComplexFixture::tearDown() 
