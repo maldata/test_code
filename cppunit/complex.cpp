@@ -33,17 +33,28 @@ Complex Complex::operator - (const Complex& other)
 
 Complex Complex::operator * (const Complex& other)
 {
-  return Complex(0, 0);
+  double new_real = (real * other.real) - (imaginary * other.imaginary);
+  double new_imag = (real * other.imaginary) + (other.real * imaginary);
+  
+  return Complex(new_real, new_imag);
 }
 
 Complex Complex::operator / (const Complex& other)
 {
-  Complex conj = Complex(other.real, -other.imaginary);
-  //  Complex result = (*this) * conj;
-  return Complex(0,0);
+  Complex conj = other.conjugate();
+  Complex numerator = (*this) * conj;
+
+  double denom = (other.real * other.real) + (other.imaginary * other.imaginary);
+  
+  return numerator / denom;
 }
 
-Complex Complex::conjugate()
+Complex Complex::operator / ( double denom )
+{
+  return Complex(real/denom, imaginary/denom);
+}
+
+Complex Complex::conjugate() const
 {
   return Complex(real, -imaginary);
 }
