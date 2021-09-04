@@ -1,6 +1,22 @@
 #include "controller.h"
 
-controller::controller(QObject *parent) : QObject(parent)
+Controller::Controller(QObject *parent)
+    : QObject(parent)
+{
+
+}
+
+Controller::~Controller()
+{
+
+}
+
+void Controller::startup()
+{
+
+}
+
+void Controller::shutdown()
 {
 
 }
